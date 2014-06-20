@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-var fs = require('fs');
 var http = require('http');
 var url = require('url');
 var mysql = require('mysql');
@@ -8,23 +7,7 @@ var mysql = require('mysql');
 var db = mysql.createConnection({});
 db.connect();
 
-var render = function render(content, vars, callback) {
-    if(vars instanceof Function) {
-        callback = vars;
-        vars = {};
-    }
-    fs.readFile('base.html', { flag: 'r' }, function load_template(err, data) {
-        if(err) {throw err;}
-        fs.readFile(content, function load_content(err, data) {
-            if(err) {throw err;}
-            vars.content = data;
-            Object.keys(vars).forEach(function(k){
-                data.replace(new RegExp('{{'+k+'}}','g'), vars[k]);
-            });
-            callback(data);
-        });
-    });
-};
+var render = require('./lib/render');
 
 http.createServer(function (req, res) {
     res.writeHead(200, {'Content-Type': 'text/html'});
