@@ -10,6 +10,7 @@ db.connect();
 
 var template = function(vars, callback) {
     fs.readFile('base.html', { flag: 'r' }, function(err, data) {
+        if(err) {throw err;}
         Object.keys(vars).forEach(function(k){
             data.replace(new RegExp('{{'+k+'}}','g'), vars[k]);
         });
@@ -48,6 +49,7 @@ http.createServer(function (req, res) {
         });
     } else {
         fs.readFile(req.url, function(err, data){
+            if(err) {throw err;}
             template({ content: data, input: params.input }, function(html){
                 res.end(html);
             });
