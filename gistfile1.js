@@ -16,7 +16,7 @@ var template = function(vars, callback) {
         });
         callback(data);
     });
-}
+};
 
 http.createServer(function (req, res) {
     res.writeHead(200, {'Content-Type': 'text/html'});
