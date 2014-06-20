@@ -9,7 +9,7 @@ var db = mysql.createConnection({});
 db.connect();
 
 var template = function(vars, callback) {
-    fs.readFile('./base.html', { flag: 'rw' }, function(err, data) {
+    fs.readFile('./base.html', { flag: 'r' }, function(err, data) {
         Object.keys(vars).forEach(function(k){
             data.replace(new RegExp('{{'+k+'}}','g'), vars[k]);
         });
