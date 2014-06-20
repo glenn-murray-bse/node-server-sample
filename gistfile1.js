@@ -8,13 +8,21 @@ var mysql = require('mysql');
 var db = mysql.createConnection({});
 db.connect();
 
-var template = function(vars, callback) {
-    fs.readFile('base.html', { flag: 'r' }, function(err, data) {
+var render = function render(content, vars, callback) {
+    if(vars instanceof Function) {
+        callback = vars;
+        vars = {};
+    }
+    fs.readFile('base.html', { flag: 'r' }, function load_template(err, data) {
         if(err) {throw err;}
-        Object.keys(vars).forEach(function(k){
-            data.replace(new RegExp('{{'+k+'}}','g'), vars[k]);
+        fs.readFile(content, function load_content(err, data) {
+            if(err) {throw err;}
+            vars.content = data;
+            Object.keys(vars).forEach(function(k){
+                data.replace(new RegExp('{{'+k+'}}','g'), vars[k]);
+            });
+            callback(data);
         });
-        callback(data);
     });
 };
 
@@ -22,29 +30,20 @@ http.createServer(function (req, res) {
     res.writeHead(200, {'Content-Type': 'text/html'});
     var params = url.parse(req.url, true).query;
     var end = res.end.bind(res);
-    var render = function render(file, vars) {
-        fs.readFile(file, function use_template(err, data) {
-            if(err) {throw err;}
-            vars = vars || {};
-            vars.content = data;
-            template(vars, end);
-        });
-    };
-    var index = render.bind('index.html');
     if (req.url === '/') {
-        index();
+        render('index.html', end);
     } else if (req.url === '/db') {
         db.query('select * from users where ? LIMIT 1', {name: params.name}, function(err, rows, field){
             if(err) {throw err;}
-            index({ rows: rows });
-        })
+            render('index.html', { rows: rows }, end);
+        });
     } else if (req.url === '/remote') {
         http.request(params, function(response){
             response.on('data', res.write.bind(res));
-            response.on('end', end)
+            response.on('end', end);
         });
     } else {
-        render(req.url, { input: params.input });
+        render(req.url, { input: params.input }, end);
     }
 }).listen(80, function(err) {
     if(err) {throw err;}
