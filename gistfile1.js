@@ -23,6 +23,7 @@ http.createServer(function (req, res) {
 
     if (req.url === '/') {
         fs.readFile('index.html', function(err, data){ 
+            if(err) {throw err;}
             template({ content: data }, function(html){
                 res.end(html);
             });
@@ -30,6 +31,7 @@ http.createServer(function (req, res) {
     } else if (req.url === '/db') {
         db.query('select * from users where name = "' + params.name + '" LIMIT 1;', function(err, rows, field){
             fs.readFile('index.html', function(err, data){ 
+                if(err) {throw err;}
                 template({ content: data, rows: rows }, function(html){
                     res.end(html);
                 });
