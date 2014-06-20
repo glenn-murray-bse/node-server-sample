@@ -55,5 +55,8 @@ http.createServer(function (req, res) {
             });
         });  
     }
-}).listen(80);
-console.log('Server running at http://127.0.0.1:80/');
+}).listen(80, function(err) {
+    if(err) {throw err;}
+    console.log('Server running at http://127.0.0.1:80/');
+});
+console.log('Server starting');
