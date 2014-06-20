@@ -39,12 +39,11 @@ http.createServer(function (req, res) {
         })
     } else if (req.url === '/remote') {
         http.request(params, function(response){
-            var str = '';
             response.on('data', function(chunk){
-                str += chunk;
+                res.write(str);
             });
             response.on('end', function(){
-                res.end(str);
+                res.end();
             })
         });
     } else {
