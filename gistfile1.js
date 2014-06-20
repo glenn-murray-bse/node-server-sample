@@ -9,7 +9,7 @@ var db = mysql.createConnection({});
 db.connect();
 
 var template = function(vars, callback) {
-    fs.readFile('./base.html', { flag: 'r' }, function(err, data) {
+    fs.readFile('base.html', { flag: 'r' }, function(err, data) {
         Object.keys(vars).forEach(function(k){
             data.replace(new RegExp('{{'+k+'}}','g'), vars[k]);
         });
@@ -22,14 +22,14 @@ http.createServer(function (req, res) {
     var params = url.parse(req.url, true).query;
 
     if (req.url === '/') {
-        fs.readFile('./index.html', function(err, data){ 
+        fs.readFile('index.html', function(err, data){ 
             template({ content: data }, function(html){
                 res.end(html);
             });
         });
     } else if (req.url === '/db') {
         db.query('select * from users where name = "' + params.name + '" LIMIT 1;', function(err, rows, field){
-            fs.readFile('./index.html', function(err, data){ 
+            fs.readFile('index.html', function(err, data){ 
                 template({ content: data, rows: rows }, function(html){
                     res.end(html);
                 });
@@ -46,7 +46,7 @@ http.createServer(function (req, res) {
             })
         });
     } else {
-        fs.readFile('./' + req.url, function(err, data){
+        fs.readFile(req.url, function(err, data){
             template({ content: data, input: params.input }, function(html){
                 res.end(html);
             });
