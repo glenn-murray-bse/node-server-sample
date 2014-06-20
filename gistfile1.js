@@ -22,11 +22,12 @@ http.createServer(function (req, res) {
     res.writeHead(200, {'Content-Type': 'text/html'});
     var params = url.parse(req.url, true).query;
     var end = res.end.bind(res);
+    var render = function(vars, err, data) {
+        if(err) {throw err;}
+        template(vars, end);
+    };
     var index = function(vars) {
-        fs.readFile('index.html', function(err, data) {
-            if(err) {throw err;}
-            template(vars, end);
-        });
+        fs.readFile('index.html', render.bind(vars));
     };
     if (req.url === '/') {
         index({ content: data });
@@ -41,9 +42,9 @@ http.createServer(function (req, res) {
             response.on('end', end)
         });
     } else {
-        fs.readFile(req.url, function(err, data){
-            if(err) {throw err;}
-            template({ content: data, input: params.input }, end);
+        fs.readFile(req.url, render.bind({
+            content: data,
+            input: params.input
         });  
     }
 }).listen(80, function(err) {
