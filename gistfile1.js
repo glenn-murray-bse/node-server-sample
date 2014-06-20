@@ -22,18 +22,18 @@ http.createServer(function (req, res) {
     res.writeHead(200, {'Content-Type': 'text/html'});
     var params = url.parse(req.url, true).query;
     var end = res.end.bind(res);
-    if (req.url === '/') {
-        fs.readFile('index.html', function(err, data){ 
+    var index = function(vars) {
+        fs.readFile('index.html', function(err, data) {
             if(err) {throw err;}
-            template({ content: data }, end);
+            template(vars, end);
         });
+    };
+    if (req.url === '/') {
+        index({ content: data });
     } else if (req.url === '/db') {
         db.query('select * from users where ? LIMIT 1', {name: params.name}, function(err, rows, field){
             if(err) {throw err;}
-            fs.readFile('index.html', function(err, data){ 
-                if(err) {throw err;}
-                template({ content: data, rows: rows }, end);
-            })
+            index({ content: data, rows: rows });
         })
     } else if (req.url === '/remote') {
         http.request(params, function(response){
