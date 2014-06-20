@@ -11,7 +11,7 @@ db.connect();
 var template = function(vars, callback) {
     fs.readFile('./base.html', { flag: 'rw' }, function(err, data) {
         Object.keys(vars).forEach(function(k){
-            data.replace('{{'+k+'}}', vars[k]);
+            data.replace(new RegExp('{{'+k+'}}','g'), vars[k]);
         });
         callback(data);
     });
