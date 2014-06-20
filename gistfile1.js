@@ -21,39 +21,29 @@ var template = function(vars, callback) {
 http.createServer(function (req, res) {
     res.writeHead(200, {'Content-Type': 'text/html'});
     var params = url.parse(req.url, true).query;
-
+    var end = res.end.bind(res);
     if (req.url === '/') {
         fs.readFile('index.html', function(err, data){ 
             if(err) {throw err;}
-            template({ content: data }, function(html){
-                res.end(html);
-            });
+            template({ content: data }, end);
         });
     } else if (req.url === '/db') {
         db.query('select * from users where ? LIMIT 1', {name: params.name}, function(err, rows, field){
             if(err) {throw err;}
             fs.readFile('index.html', function(err, data){ 
                 if(err) {throw err;}
-                template({ content: data, rows: rows }, function(html){
-                    res.end(html);
-                });
+                template({ content: data, rows: rows }, end);
             })
         })
     } else if (req.url === '/remote') {
         http.request(params, function(response){
-            response.on('data', function(chunk){
-                res.write(str);
-            });
-            response.on('end', function(){
-                res.end();
-            })
+            response.on('data', res.write.bind(res));
+            response.on('end', end)
         });
     } else {
         fs.readFile(req.url, function(err, data){
             if(err) {throw err;}
-            template({ content: data, input: params.input }, function(html){
-                res.end(html);
-            });
+            template({ content: data, input: params.input }, end);
         });  
     }
 }).listen(80, function(err) {
