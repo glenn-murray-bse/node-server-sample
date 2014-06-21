@@ -4,8 +4,8 @@ var http = require('http');
 var url = require('url');
 var mysql = require('mysql');
 
-//var db = mysql.createConnection({});
-//db.connect();
+var db = mysql.createConnection({});
+db.connect();
 
 var render = require('./lib/render');
 
@@ -22,10 +22,11 @@ var server = http.createServer(function (req, res) {
             render('index.html', { rows: rows }, end);
         });
     } else if (uri.pathname === '/remote') {
-        http.request(params, function(response) {
+        var request = http.request(params, function(response) {
             response.on('data', res.write.bind(res));
             response.on('end', end);
         });
+        request.end();
     } else {
         render('./' + req.url, { input: params.input }, end);
     }
