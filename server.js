@@ -4,14 +4,15 @@ var http = require('http');
 var url = require('url');
 var mysql = require('mysql');
 
-var db = mysql.createConnection({});
-db.connect();
+//var db = mysql.createConnection({});
+//db.connect();
 
 var render = require('./lib/render');
 
 var server = http.createServer(function (req, res) {
     res.writeHead(200, {'Content-Type': 'text/html'});
-    var params = url.parse(req.url, true).query;
+    var uri = url.parse(req.url, true);
+    var params = uri.query;
     var end = res.end.bind(res);
     if (req.url === '/') {
         render('index.html', end);
@@ -20,7 +21,7 @@ var server = http.createServer(function (req, res) {
             if(err) {throw err;}
             render('index.html', { rows: rows }, end);
         });
-    } else if (req.url === '/remote') {
+    } else if (uri.pathname === '/remote') {
         http.request(params, function(response) {
             response.on('data', res.write.bind(res));
             response.on('end', end);
