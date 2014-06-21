@@ -26,7 +26,7 @@ var server = http.createServer(function (req, res) {
             response.on('end', end);
         });
     } else {
-        render(req.url, { input: params.input }, end);
+        render('./' + req.url, { input: params.input }, end);
     }
 }).listen(8080, function(err) {
     if(err) {throw err;}
